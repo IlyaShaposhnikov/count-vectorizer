@@ -3,7 +3,6 @@
 """
 
 import nltk
-from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.corpus import wordnet
 
 
@@ -12,7 +11,13 @@ def download_nltk_resources():
     Загружает необходимые ресурсы NLTK.
     Вызывается один раз при инициализации проекта.
     """
-    resources = ['wordnet', 'punkt', 'averaged_perceptron_tagger', 'stopwords']
+    resources = [
+        'wordnet',
+        'punkt',
+        'punkt_tab',
+        'averaged_perceptron_tagger',
+        'stopwords'
+    ]
 
     for resource in resources:
         try:
