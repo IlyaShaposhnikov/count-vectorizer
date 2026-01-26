@@ -193,7 +193,8 @@ def visualize_results(results_df):
         bars = ax4.barh(results_df['method_name'], results_df['density_percent'])
         ax4.set_xlabel('Плотность, %')
         ax4.set_title('Плотность матрицы признаков')
-        ax4.set_xlim([0, 1])  # Обычно плотность < 1%
+        max_density = results_df['density_percent'].max()
+        ax4.set_xlim([0, max_density * 1.1])
 
         # Добавляем значения на столбцы
         for bar, value in zip(bars, results_df['density_percent']):
@@ -246,19 +247,13 @@ def print_detailed_comparison(results):
     headers = ["Метод", "Train Acc", "Test Acc", "Словарь", "Плотность", "Время"]
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
-    # Выводим выводы
+    # Выводим вывод
     print("\n" + "="*80)
-    print("ВЫВОДЫ:")
+    print("ВЫВОД:")
     print("="*80)
 
     best_method = df.iloc[0]
     print(f"Лучший метод: {best_method['method_name']} с точностью {best_method['test_accuracy']:.2f}%")
-
-    print("\nНаблюдения:")
-    print("1. Размер словаря влияет на время выполнения и качество модели")
-    print("2. Удаление стоп-слов обычно уменьшает размерность")
-    print("3. Лемматизация и стемминг могут улучшить или ухудшить качество")
-    print("4. Простой токенизатор самый быстрый, но может быть менее точным")
 
     # Сохраняем результаты в CSV
     results_dir = 'results'
