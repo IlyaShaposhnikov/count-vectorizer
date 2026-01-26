@@ -53,8 +53,8 @@ def get_vectorizer_info(vectorizer, X_train):
         'vocabulary_size': len(vocabulary),
         'density_percent': density * 100,
         'shape': X_train.shape,
-        'example_features': list(vocabulary.keys())[:10]
         # Пример первых 10 фич
+        'example_features': list(vocabulary.keys())[:10]
     }
 
 
