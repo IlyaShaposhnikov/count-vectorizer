@@ -16,6 +16,7 @@ def download_nltk_resources():
         'punkt',
         'punkt_tab',
         'averaged_perceptron_tagger',
+        'averaged_perceptron_tagger_eng',
         'stopwords'
     ]
 
