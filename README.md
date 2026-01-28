@@ -112,5 +112,7 @@ count-vectorizer/
 
 ## Автор
 Илья Шапошников
+
 https://github.com/IlyaShaposhnikov/
+
 ilia.a.shaposhnikov@gmail.com
