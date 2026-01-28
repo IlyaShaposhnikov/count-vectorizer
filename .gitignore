@@ -43,9 +43,9 @@ ENV/
 *.h5
 *.hdf5
 
-# Results (можно игнорировать, но для проекта оставим)
-# results/
-# !results/.gitkeep
+data/*.csv
+data/*.pkl
+results/
 
 # OS
 .DS_Store
