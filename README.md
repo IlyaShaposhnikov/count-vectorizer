@@ -29,9 +29,7 @@ cd count-vectorizer
 pip install -r requirements.txt
 ```
 
-3. Скачайте датасет и поместите его в папку `data` в корне проекта:
-
-Скачать датасет на [Kaggle](https://www.kaggle.com/datasets/abdulraffayali/bbc-text-cls)
+3. [Скачайте датасет](https://www.kaggle.com/datasets/abdulraffayali/bbc-text-cls) и поместите его в папку `data` в корне проекта:
 
 ### Использование
 Запустите основной скрипт сравнения:
