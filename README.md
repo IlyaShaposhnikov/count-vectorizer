@@ -1,118 +1,120 @@
+**[Russian Version / На русском](README.ru.md)**
+
 # CountVectorizer Comparison Project
 
-Проект для сравнения различных методов предобработки текста при использовании CountVectorizer в машинном обучении.
+A project for comparing various text preprocessing methods when using CountVectorizer in machine learning.
 
-## Описание проекта
+## Project Description
 
-Этот проект сравнивает 5 различных подходов к векторизации текста с использованием `CountVectorizer` из библиотеки scikit-learn:
-1. **Базовый метод** - стандартный CountVectorizer без дополнительной обработки
-2. **С удалением стоп-слов** - удаление общеупотребительных слов (например, "the", "and", "is")
-3. **С лемматизацией** - приведение слов к их нормальной форме (лемме)
-4. **Со стеммингом** - обрезание окончаний слов до основы (стема)
-5. **С простым токенизатором** - быстрое разделение по пробелам без обработки пунктуации
+This project compares 5 different approaches to text vectorization using `CountVectorizer` from the scikit-learn library:
+1.  **Base Method** - Standard CountVectorizer without additional processing
+2.  **With Stop Words Removal** - Removal of common words (e.g., "the", "and", "is")
+3.  **With Lemmatization** - Reducing words to their normal form (lemma)
+4.  **With Stemming** - Trimming word endings to their root (stem)
+5.  **With Simple Tokenizer** - Fast splitting by spaces without punctuation handling
 
-Проект использует датасет новостей BBC для классификации и сравнивает эффективность каждого метода по нескольким метрикам.
+The project uses the BBC news dataset for classification and compares the effectiveness of each method across several metrics.
 
-## Быстрый старт
+## Quick Start
 
-### Установка
+### Installation
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
+
 ```bash
 git clone https://github.com/IlyaShaposhnikov/count-vectorizer.git
 cd count-vectorizer
 ```
 
-2. Установите зависимости:
+2. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Скачайте датасет и поместите его в папку `data` в корне проекта:
+3.  Download the dataset and place it into the `data` folder:
 
-Скачать датасет на [Kaggle](https://www.kaggle.com/datasets/abdulraffayali/bbc-text-cls)
+Download the dataset on [Kaggle](https://www.kaggle.com/datasets/abdulraffayali/bbc-text-cls)
 
-### Использование
-Запустите основной скрипт сравнения:
+### Usage
+Run the main comparison script:
 
 ```bash
 python main.py
 ```
 
-Скрипт автоматически:
-1. Загрузит необходимые ресурсы NLTK (_При первом запуске это может занять несколько минут в зависимости от скорости вашего интернет-соединения. Последующие запуски будут происходить мгновенно._) 
-2. Загрузит и подготовит данные
-3. Обучит модели с разными методами векторизации
-4. Выведет сравнение результатов
-5. Создаст визуализации
+The script will automatically:
+1. Download necessary NLTK resources (_On the first run, this may take a few minutes depending on your internet connection speed. Subsequent runs will be instantaneous._) 
+2. Load and prepare the data
+3. Train models with different vectorization methods
+4. Print the comparison results
+5. Generate visualizations
 
-## Структура проекта
+## Project Structure
 ```text
 count-vectorizer/
-├── data/                               # Папка с данными
-│   └── bbc_text_cls.csv                # Датасет новостей BBC
-├── methods/                            # Реализации различных методов векторизации
-│   ├── base_vectorizer.py              # Базовый метод
-│   ├── stopwords_vectorizer.py         # С удалением стоп-слов
-│   ├── lemmatization_vectorizer.py     # С лемматизацией
-│   ├── stemming_vectorizer.py          # Со стеммингом
-│   └── simple_tokenizer_vectorizer.py  # С простым токенизатором
-├── utils/                              # Вспомогательные утилиты
-│   └── nltk_utils.py                   # Утилиты для работы с NLTK
-├── results/                            # Папка для сохранения результатов
-├── main.py                             # Основной скрипт сравнения
-├── requirements.txt                    # Зависимости проекта
-└── README.md                           # Этот файл
+├── data/                               # Data folder
+│   └── bbc_text_cls.csv                # BBC News Dataset
+├── methods/                            # Implementations of various vectorization methods
+│   ├── base_vectorizer.py              # Base method
+│   ├── stopwords_vectorizer.py         # With stop words removal
+│   ├── lemmatization_vectorizer.py     # With lemmatization
+│   ├── stemming_vectorizer.py          # With stemming
+│   └── simple_tokenizer_vectorizer.py  # With simple tokenizer
+├── utils/                              # Utility scripts
+│   └── nltk_utils.py                   # Utilities for working with NLTK
+├── results/                            # Folder for saving results
+├── main.py                             # Main comparison script
+├── requirements.txt                    # Project dependencies
+├── README.md                           # Project documentation (English)
+└── README.ru.md                        # Project documentation (Russian)
 ```
 
-## Метрики сравнения
-Каждый метод оценивается по следующим метрикам:
-* Точность на тренировочных данных - точность модели на данных, на которых она обучалась
-* Точность на тестовых данных - точность модели на новых данных (основная метрика)
-* Размер словаря - количество уникальных слов после обработки
-* Плотность матрицы - процент ненулевых элементов в матрице признаков
-* Время выполнения - общее время обучения и оценки метода
+## Comparison Metrics
+Each method is evaluated based on the following metrics:
+* Training Accuracy - Model accuracy on the training data
+* Test Accuracy - Model accuracy on new data (primary metric)
+* Vocabulary Size - Number of unique words after processing
+* Matrix Density - Percentage of non-zero elements in the feature matrix
+* Execution Time - Total time for training and evaluation of the method
 
-## Технические детали
-### Используемые библиотеки
-* numpy - работа с числовыми массивами
-* pandas - обработка и анализ данных
-* scikit-learn - машинное обучение и CountVectorizer
-* nltk - обработка естественного языка
-* matplotlib/seaborn - визуализация результатов
-* tabulate - человекочитаемое отображение таблиц
+## Technical Details
+### Libraries Used
+* numpy - Working with numerical arrays
+* pandas - Data processing and analysis
+* scikit-learn - Machine learning and CountVectorizer
+* nltk - Natural language processing
+* matplotlib/seaborn - Result visualization
+* tabulate - Human-readable table display
 
-### Датасет
-Проект использует датасет BBC News, содержащий 2225 документов в 5 категориях:
-* business (510 документов)
-* entertainment (386 документов)
-* politics (417 документов)
-* sport (511 документов)
-* tech (401 документ)
+### Dataset
+The project uses the BBC News dataset, containing 2225 documents across 5 categories:
+* business (510 documents)
+* entertainment (386 documents)
+* politics (417 documents)
+* sport (511 documents)
+* tech (401 document)
 
-### Алгоритм классификации
-Для всех методов используется Multinomial Naive Bayes - алгоритм, хорошо зарекомендовавший себя для классификации текстов.
+### Classification Algorithm
+Multinomial Naive Bayes is used for all methods - an algorithm well-suited for text classification.
 
-## Пример вывода
-После запуска `main.py` вы увидите:
-1. Прогресс выполнения каждого метода
-2. Детальную таблицу сравнения
-3. Графики с визуализацией результатов
-4. Сохраненные результаты: таблица `detailed_results.csv` и график `comparison_results.png` в папке `results/`
+## Result Output
+After running `main.py`, you will see:
+1. Progress of each method execution
+2. A detailed comparison table
+3. Graphs with result visualizations
+4. Saved results: `detailed_results.csv` table and `comparison_results.png` graph in the `results` folder
 
-## Ключевые выводы
-Из сравнения обычно следует:
-1. Удаление стоп-слов уменьшает размерность и часто улучшает качество
-2. Лемматизация дает более качественные результаты, чем стемминг (97.31% против 96.77%)
-3. Простые методы быстрее, но могут быть менее точными
-4. Размер словаря напрямую влияет на время обучения модели
-5. Плотность матрицы признаков обычно очень низкая (часто <1%, но может возрастать при агрессивной обработке текста, такой как стемминг или лемматизация, которые сокращают словарь)
-6. Компромисс между скоростью и точностью: На датасете BBC News метод с удалением стоп-слов показал наилучший баланс, обеспечив максимальную точность (97.49%) при самом низком времени выполнения (0.46 с). Лемматизация дала схожую точность (97.31%), но оказалась значительно медленнее (33.66 с) из-за сложности лингвистического анализа.
+## Key Findings
+The comparison demonstrates the following trends:
+1.  **Stop-word Removal:** Generally reduces dimensionality (vocabulary size) and often improves classification accuracy compared to the base method.
+2.  **Lemmatization vs. Stemming:** Lemmatization usually achieves higher accuracy than stemming (e.g., ~97.3% vs ~96.8% in typical runs), but at a significant computational cost, resulting in much longer execution times.
+3.  **Speed vs. Accuracy:** Simpler methods (like removing stop-words or using a simple tokenizer) are generally much faster than complex ones (like lemmatization or stemming). The stop-words removal method often provides a good balance, frequently achieving high accuracy while remaining relatively fast. However, the absolute fastest method might vary slightly between runs depending on the system.
+4.  **Vocabulary Size & Density:** More aggressive text processing (like stemming or lemmatization) tends to reduce vocabulary size compared to simpler methods. This often leads to a *higher* feature matrix density (as the same concepts are represented by fewer unique terms), although the density remains quite low overall (typically well below 2%).
 
-## Автор
-Илья Шапошников
 
-https://github.com/IlyaShaposhnikov/
+## Author
 
-ilia.a.shaposhnikov@gmail.com
+Ilya Shaposhnikov | [E-mail](mailto:ilia.a.shaposhnikov@gmail.com) | [LinkedIn](https://linkedin.com/in/iliashaposhnikov)
+
+**[Russian Version / На русском](README.ru.md)**
