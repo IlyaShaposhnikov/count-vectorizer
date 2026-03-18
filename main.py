@@ -3,14 +3,14 @@
 Сравнивает 5 подходов к предобработке текста для классификации новостей BBC.
 """
 
-import pandas as pd
-import numpy as np
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tabulate import tabulate
 import time
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from tabulate import tabulate
 
 # Импортируем наши методы векторизации
 from methods.base_vectorizer import (
@@ -297,7 +297,7 @@ def main():
             'info_getter': get_base_info
         },
         {
-            'name': 'Со стоп-словами',
+            'name': 'С удалением стоп-слов',
             'vectorizer_creator': create_stopwords_vectorizer,
             'info_getter': get_stopwords_info
         },
