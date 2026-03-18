@@ -1,71 +1,41 @@
 """
-Основной скрипт для сравнения различных методов CountVectorizer.
-Сравнивает 5 подходов к предобработке текста для классификации новостей BBC.
+Main script for comparing various CountVectorizer methods.
+Compares 5 text preprocessing approaches for BBC news classification.
 """
 
 import time
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
-from tabulate import tabulate
 
-# Импортируем наши методы векторизации
 from methods.base_vectorizer import (
     create_base_vectorizer,
     get_vectorizer_info as get_base_info,
-)
-from methods.stopwords_vectorizer import (
-    create_stopwords_vectorizer,
-    get_vectorizer_info as get_stopwords_info,
 )
 from methods.lemmatization_vectorizer import (
     create_lemmatization_vectorizer,
     get_vectorizer_info as get_lemmatization_info,
 )
-from methods.stemming_vectorizer import (
-    create_stemming_vectorizer,
-    get_vectorizer_info as get_stemming_info,
-)
 from methods.simple_tokenizer_vectorizer import (
     create_simple_tokenizer_vectorizer,
     get_vectorizer_info as get_simple_info,
 )
-
-# Импортируем утилиты NLTK
+from methods.stemming_vectorizer import (
+    create_stemming_vectorizer,
+    get_vectorizer_info as get_stemming_info,
+)
+from methods.stopwords_vectorizer import (
+    create_stopwords_vectorizer,
+    get_vectorizer_info as get_stopwords_info,
+)
+from utils.data_loader import load_data
 from utils.nltk_utils import download_nltk_resources
+from utils.reporting import print_detailed_comparison
+from utils.visualization import visualize_results
 
-
-def load_data(data_path='data/bbc_text_cls.csv'):
-    """
-    Загружает датасет BBC News для классификации текста.
-
-    Args:
-        data_path (str): Путь к файлу с данными
-
-    Returns:
-        tuple: (inputs, labels) - тексты и метки
-    """
-    print(f"Загрузка данных из {data_path}")
-    df = pd.read_csv(data_path)
-
-    # Проверяем структуру данных
-    print(f"Размер датасета: {df.shape}")
-    print(f"Колонки: {df.columns.tolist()}")
-
-    # Разделяем на признаки и метки
-    inputs = df['text']
-    labels = df['labels']
-
-    # Выводим информацию о распределении классов
-    print("\nРаспределение меток:")
-    label_counts = labels.value_counts()
-    for label, count in label_counts.items():
-        print(f"  {label}: {count} документов ({count/len(labels)*100:.1f}%)")
-
-    return inputs, labels
+TEST_SIZE = 0.25
+RANDOM_STATE = 123
 
 
 def evaluate_method(
@@ -73,51 +43,51 @@ def evaluate_method(
         inputs_test, Ytrain, Ytest, method_name
 ):
     """
-    Оценивает метод векторизации на данных.
+    Evaluates a vectorization method on data.
 
     Args:
-        vectorizer_creator: Функция создания векторизатора
-        info_getter: Функция получения информации о векторизаторе
-        inputs_train: Тренировочные тексты
-        inputs_test: Тестовые тексты
-        Ytrain: Тренировочные метки
-        Ytest: Тестовые метки
-        method_name: Название метода
+        vectorizer_creator: Function to create the vectorizer
+        info_getter: Function to get vectorizer information
+        inputs_train: Training texts
+        inputs_test: Test texts
+        Ytrain: Training labels
+        Ytest: Test labels
+        method_name: Name of the method
 
     Returns:
-        dict: Результаты оценки метода
+        dict: Results of the evaluation
     """
     print(f"\n{'='*60}")
-    print(f"Оценка метода: {method_name}")
+    print(f"Evaluating method: {method_name}")
     print(f"{'='*60}")
 
     start_time = time.time()
 
-    # Создаем и обучаем векторизатор
+    # Create and fit the vectorizer
     vectorizer = vectorizer_creator()
-    print("Векторизация тренировочных данных...")
+    print("Vectorizing training data...")
     X_train = vectorizer.fit_transform(inputs_train)
 
-    # Преобразуем тестовые данные
-    print("Векторизация тестовых данных...")
+    # Transform test data
+    print("Vectorizing test data...")
     X_test = vectorizer.transform(inputs_test)
 
-    # Получаем информацию о векторизаторе
+    # Get vectorizer info
     vectorizer_info = info_getter(vectorizer, X_train)
 
-    # Обучаем модель Naive Bayes
-    print("Обучение модели MultinomialNB...")
+    # Train the Naive Bayes model
+    print("Training MultinomialNB model...")
     model = MultinomialNB()
     model.fit(X_train, Ytrain)
 
-    # Оцениваем модель
+    # Evaluate the model
     train_score = model.score(X_train, Ytrain)
     test_score = model.score(X_test, Ytest)
 
     end_time = time.time()
     execution_time = end_time - start_time
 
-    # Собираем результаты
+    # Collect results
     results = {
         'method_name': method_name,
         'train_accuracy': train_score * 100,
@@ -128,197 +98,73 @@ def evaluate_method(
         'vectorizer_info': vectorizer_info
     }
 
-    print(f"  Точность на тренировочных данных: {train_score:.3%}")
-    print(f"  Точность на тестовых данных: {test_score:.3%}")
-    print(f"  Размер словаря: {vectorizer_info['vocabulary_size']} слов")
-    print(f"  Плотность матрицы: {vectorizer_info.get('density_percent', 0):.2f}%")
-    print(f"  Время выполнения: {execution_time:.2f} секунд")
+    print(f"  Training accuracy: {train_score:.3%}")
+    print(f"  Test accuracy: {test_score:.3%}")
+    print(f"  Vocabulary size: {vectorizer_info['vocabulary_size']} words")
+    print(
+        "  Matrix density: "
+        f"{vectorizer_info.get('density_percent', 0):.2f}%"
+    )
+    print(f"  Execution time: {execution_time:.2f} seconds")
 
     return results
 
 
-def visualize_results(results_df):
-    """
-    Визуализирует результаты сравнения методов.
-
-    Args:
-        results_df: DataFrame с результатами
-    """
-    # Настройка стиля графиков
-    plt.style.use('seaborn-v0_8-darkgrid')
-    sns.set_palette("husl")
-
-    # Создаем фигуру с несколькими subplots
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle('Сравнение методов CountVectorizer', fontsize=16, fontweight='bold')
-
-    # 1. Точность на тестовых данных
-    ax1 = axes[0, 0]
-    bars = ax1.barh(results_df['method_name'], results_df['test_accuracy'])
-    ax1.set_xlabel('Точность, %')
-    ax1.set_title('Точность на тестовых данных')
-    ax1.set_xlim([0, 100])
-
-    # Добавляем значения на столбцы
-    for bar, value in zip(bars, results_df['test_accuracy']):
-        ax1.text(value + 0.5, bar.get_y() + bar.get_height()/2,
-                 f'{value:.1f}%', va='center', fontweight='bold')
-
-    # 2. Размер словаря
-    ax2 = axes[0, 1]
-    bars = ax2.barh(results_df['method_name'], results_df['vocabulary_size'])
-    ax2.set_xlabel('Количество слов')
-    ax2.set_title('Размер словаря (количество уникальных слов)')
-
-    # Добавляем значения на столбцы
-    for bar, value in zip(bars, results_df['vocabulary_size']):
-        ax2.text(value + max(results_df['vocabulary_size'])*0.01,
-                 bar.get_y() + bar.get_height()/2,
-                 f'{value:,}', va='center', fontweight='bold')
-
-    # 3. Время выполнения
-    ax3 = axes[1, 0]
-    bars = ax3.barh(results_df['method_name'], results_df['execution_time'])
-    ax3.set_xlabel('Время, секунды')
-    ax3.set_title('Время выполнения')
-
-    # Добавляем значения на столбцы
-    for bar, value in zip(bars, results_df['execution_time']):
-        ax3.text(value + 0.05, bar.get_y() + bar.get_height()/2,
-                 f'{value:.2f}с', va='center', fontweight='bold')
-
-    # 4. Плотность матрицы (если есть данные)
-    if 'density_percent' in results_df.columns:
-        ax4 = axes[1, 1]
-        bars = ax4.barh(results_df['method_name'], results_df['density_percent'])
-        ax4.set_xlabel('Плотность, %')
-        ax4.set_title('Плотность матрицы признаков')
-        max_density = results_df['density_percent'].max()
-        ax4.set_xlim([0, max_density * 1.1])
-
-        # Добавляем значения на столбцы
-        for bar, value in zip(bars, results_df['density_percent']):
-            ax4.text(value + 0.01, bar.get_y() + bar.get_height()/2,
-                     f'{value:.3f}%', va='center', fontweight='bold')
-    else:
-        # Если нет данных о плотности, показываем заглушку
-        ax4 = axes[1, 1]
-        ax4.text(0.5, 0.5, 'Нет данных о плотности',
-                 ha='center', va='center', fontsize=12)
-        ax4.set_title('Плотность матрицы признаков')
-        ax4.set_xticks([])
-        ax4.set_yticks([])
-
-    plt.tight_layout()
-    plt.savefig('results/comparison_results.png', dpi=300, bbox_inches='tight')
-    print("\nГрафики сохранены в 'results/comparison_results.png'")
-    plt.show()
-
-
-def print_detailed_comparison(results):
-    """
-    Выводит детальное сравнение методов в виде таблицы.
-
-    Args:
-        results: Список словарей с результатами
-    """
-    # Создаем DataFrame для удобного отображения
-    df = pd.DataFrame(results)
-
-    # Сортируем по точности на тестовых данных
-    df = df.sort_values('test_accuracy', ascending=False)
-
-    print("\n" + "="*80)
-    print("ДЕТАЛЬНОЕ СРАВНЕНИЕ МЕТОДОВ COUNTVECTORIZER")
-    print("="*80)
-
-    # Создаем таблицу для отображения
-    table_data = []
-    for _, row in df.iterrows():
-        table_data.append([
-            row['method_name'],
-            f"{row['train_accuracy']:.2f}%",
-            f"{row['test_accuracy']:.2f}%",
-            f"{row['vocabulary_size']:,}",
-            f"{row.get('density_percent', 0):.4f}%" if 'density_percent' in row else "N/A",
-            f"{row['execution_time']:.2f}с"
-        ])
-
-    headers = ["Метод", "Train Acc", "Test Acc", "Словарь", "Плотность", "Время"]
-    print(tabulate(table_data, headers=headers, tablefmt="grid"))
-
-    # Выводим вывод
-    print("\n" + "="*80)
-    print("ВЫВОД:")
-    print("="*80)
-
-    best_method = df.iloc[0]
-    print(f"Лучший метод: {best_method['method_name']} с точностью {best_method['test_accuracy']:.2f}%")
-
-    # Сохраняем результаты в CSV
-    results_dir = 'results'
-    import os
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-
-    df.to_csv(f'{results_dir}/detailed_results.csv', index=False)
-    print(f"\nДетальные результаты сохранены в '{results_dir}/detailed_results.csv'")
-
-
 def main():
     """
-    Основная функция для сравнения методов CountVectorizer.
+    Main function to compare CountVectorizer methods.
     """
     print("="*80)
-    print("СРАВНЕНИЕ МЕТОДОВ ПРЕДОБРАБОТКИ ТЕКСТА ДЛЯ COUNTVECTORIZER")
+    print("COUNTVECTORIZER TEXT PREPROCESSING METHODS COMPARISON")
     print("="*80)
 
-    # Загружаем ресурсы NLTK
-    print("\nЗагрузка ресурсов NLTK...")
+    # Load NLTK resources
+    print("\nDownloading NLTK resources...")
     download_nltk_resources()
 
-    # Загружаем данные
+    # Load data
     inputs, labels = load_data()
 
-    # Разделяем на тренировочную и тестовую выборки
-    print("\nРазделение данных на тренировочную и тестовую выборки...")
+    # Split data into train and test sets
+    print("\nSplitting data into train and test sets...")
     inputs_train, inputs_test, Ytrain, Ytest = train_test_split(
-        inputs, labels, test_size=0.25, random_state=123, stratify=labels
+        inputs, labels, test_size=TEST_SIZE,
+        random_state=RANDOM_STATE, stratify=labels
     )
 
-    print(f"  Тренировочная выборка: {len(inputs_train)} документов")
-    print(f"  Тестовая выборка: {len(inputs_test)} документов")
+    print(f"  Training set: {len(inputs_train)} documents")
+    print(f"  Test set: {len(inputs_test)} documents")
 
-    # Определяем методы для сравнения
+    # Define methods for comparison
     methods = [
         {
-            'name': 'Базовый',
+            'name': 'Basic',
             'vectorizer_creator': create_base_vectorizer,
             'info_getter': get_base_info
         },
         {
-            'name': 'С удалением стоп-слов',
+            'name': 'With Stop Words Removal',
             'vectorizer_creator': create_stopwords_vectorizer,
             'info_getter': get_stopwords_info
         },
         {
-            'name': 'С лемматизацией',
+            'name': 'With Lemmatization',
             'vectorizer_creator': create_lemmatization_vectorizer,
             'info_getter': get_lemmatization_info
         },
         {
-            'name': 'Со стеммингом',
+            'name': 'With Stemming',
             'vectorizer_creator': create_stemming_vectorizer,
             'info_getter': get_stemming_info
         },
         {
-            'name': 'С простым токенизатором',
+            'name': 'With Simple Tokenizer',
             'vectorizer_creator': create_simple_tokenizer_vectorizer,
             'info_getter': get_simple_info
         }
     ]
 
-    # Оцениваем каждый метод
+    # Evaluate each method
     all_results = []
 
     for method in methods:
@@ -333,18 +179,18 @@ def main():
         )
         all_results.append(results)
 
-    # Выводим детальное сравнение
+    # Print detailed comparison
     print_detailed_comparison(all_results)
 
-    # Визуализируем результаты
+    # Visualize results
     try:
         visualize_results(pd.DataFrame(all_results))
     except Exception as e:
-        print(f"\nОшибка при визуализации: {e}")
-        print("Продолжение без визуализации...")
+        print(f"\nVisualization error: {e}")
+        print("Continuing without visualization...")
 
     print("\n" + "="*80)
-    print("СРАВНЕНИЕ ЗАВЕРШЕНО!")
+    print("COMPARISON FINISHED!")
     print("="*80)
 
 
