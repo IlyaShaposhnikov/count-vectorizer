@@ -62,7 +62,11 @@ count-vectorizer/
 │   ├── stemming_vectorizer.py          # Со стеммингом
 │   └── simple_tokenizer_vectorizer.py  # С простым токенизатором
 ├── utils/                              # Вспомогательные утилиты
-│   └── nltk_utils.py                   # Утилиты для работы с NLTK
+│   ├── data_loader.py                  # Загрузка данных
+│   ├── nltk_utils.py                   # Управление ресурсами NLTK и вспомогательные функции
+│   ├── reporting.py                    # Вывод и сохранение результатов
+│   ├── vectorizer_utils.py             # Общие функции для векторизаторов
+│   └── visualization.py                # Визуализация результатов
 ├── results/                            # Папка для сохранения результатов
 ├── main.py                             # Основной скрипт сравнения
 ├── requirements.txt                    # Зависимости проекта
