@@ -1,43 +1,44 @@
 """
-CountVectorizer с лемматизацией токенов.
-Лемматизация приводит слова к их нормальной форме (лемме).
+CountVectorizer with token lemmatization.
+Lemmatization reduces words to their dictionary form (lemma).
 """
 
-from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
 import nltk
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import CountVectorizer
+
 from utils.nltk_utils import get_wordnet_pos
+from utils.vectorizer_utils import calculate_common_vectorizer_metrics
 
 
 class LemmaTokenizer:
     """
-    Кастомный токенизатор для CountVectorizer с лемматизацией.
-    Приводит слова к их базовой форме с учетом части речи.
+    Custom tokenizer for CountVectorizer with lemmatization.
+    Reduces words to their base form considering part-of-speech tags.
     """
 
     def __init__(self):
-        """Инициализирует лемматизатор WordNet."""
+        """Initializes the WordNet lemmatizer."""
         self.wnl = WordNetLemmatizer()
 
     def __call__(self, doc):
         """
-        Токенизирует и лемматизирует документ.
+        Tokenizes and lemmatizes a document.
 
         Args:
-            doc (str): Входной текст
+            doc (str): Input text
 
         Returns:
-            list: Список лемматизированных токенов
+            list: List of lemmatized tokens
         """
-        # Токенизируем документ
+        # Tokenize the document
         tokens = word_tokenize(doc)
 
-        # Определяем части речи для каждого токена
+        # Determine part-of-speech tags for each token
         words_and_tags = nltk.pos_tag(tokens)
 
-        # Лемматизируем каждый токен с учетом части речи
+        # Lemmatize each token considering its POS tag
         lemmas = [
             self.wnl.lemmatize(word, pos=get_wordnet_pos(tag))
             for word, tag in words_and_tags
@@ -48,19 +49,20 @@ class LemmaTokenizer:
 
 def create_lemmatization_vectorizer():
     """
-    Создает CountVectorizer с лемматизацией токенов.
+    Creates a CountVectorizer with token lemmatization.
 
     Returns:
-        CountVectorizer: Векторизатор с лемматизацией
+        CountVectorizer: Vectorizer with lemmatization
     """
     vectorizer = CountVectorizer(
-        tokenizer=LemmaTokenizer(),  # Используем кастомный токенизатор
+        # Use custom tokenizer
+        tokenizer=LemmaTokenizer(),
         lowercase=True,
         max_df=0.95,
         min_df=2,
         max_features=None,
-        # Отключаем стандартный паттерн
-        # при использовании кастомного токенизатора
+        # Disable standard pattern
+        # when using custom tokenizer
         token_pattern=None
     )
 
@@ -69,37 +71,30 @@ def create_lemmatization_vectorizer():
 
 def get_vectorizer_info(vectorizer, X_train):
     """
-    Возвращает информацию о векторизаторе с лемматизацией.
+    Returns information about the lemmatization vectorizer.
 
     Args:
-        vectorizer: Обученный векторизатор
-        X_train: Преобразованные тренировочные данные
+        vectorizer: Fitted vectorizer
+        X_train: Transformed training data
 
     Returns:
-        dict: Словарь с информацией о векторизаторе
+        dict: Dictionary containing vectorizer information
     """
-    vocabulary = vectorizer.vocabulary_
-
-    # Рассчитываем плотность матрицы
-    if hasattr(X_train, 'toarray'):
-        density = (X_train != 0).sum() / np.prod(X_train.shape)
-    else:
-        density = np.count_nonzero(X_train) / X_train.size
-
-    return {
-        'name': 'CountVectorizer с лемматизацией',
-        'vocabulary_size': len(vocabulary),
-        'density_percent': density * 100,
-        'shape': X_train.shape,
+    # Prepare specific info for this method
+    extra_info = {
+        'name': 'CountVectorizer with lemmatization',
         'tokenizer_type': 'LemmaTokenizer',
-        'example_features': list(vocabulary.keys())[:10]
+        # example_features is handled by the common function
     }
+
+    # Calculate common metrics using the shared function
+    return calculate_common_vectorizer_metrics(vectorizer, X_train, extra_info)
 
 
 if __name__ == "__main__":
-    # Пример использования
-    print("Модуль CountVectorizer с лемматизацией")
+    # Example usage
+    print("CountVectorizer with Lemmatization Module")
     tokenizer = LemmaTokenizer()
     sample_text = "The cats are running and jumping around."
-    print(f"Пример лемматизации: '{sample_text}'")
-    print(f"Результат: {tokenizer(sample_text)}")
+    print(f"Example lemmatization: '{sample_text}'")
+    print(f"Result: {tokenizer(sample_text)}")

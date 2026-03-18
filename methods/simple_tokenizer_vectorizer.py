@@ -1,34 +1,37 @@
 """
-CountVectorizer с простым токенизатором на основе split().
-Это самый быстрый, но наименее точный метод токенизации.
+CountVectorizer with a simple tokenizer based on split().
+This is the fastest but least accurate tokenization method.
 """
 
 from sklearn.feature_extraction.text import CountVectorizer
 
+from utils.vectorizer_utils import calculate_common_vectorizer_metrics
+
 
 def simple_tokenizer(s):
     """
-    Простой токенизатор на основе split().
-    Разделяет строку по пробелам без учета пунктуации.
+    Simple tokenizer based on split().
+    Splits the string by whitespace without considering punctuation.
 
     Args:
-        s (str): Входная строка
+        s (str): Input string
 
     Returns:
-        list: Список токенов
+        list: List of tokens
     """
     return s.split()
 
 
 def create_simple_tokenizer_vectorizer():
     """
-    Создает CountVectorizer с простым токенизатором.
+    Creates a CountVectorizer with a simple tokenizer.
 
     Returns:
-        CountVectorizer: Векторизатор с простым токенизатором
+        CountVectorizer: Vectorizer with simple tokenizer
     """
     vectorizer = CountVectorizer(
-        tokenizer=simple_tokenizer,  # Используем простой токенизатор
+        # Use simple tokenizer
+        tokenizer=simple_tokenizer,
         lowercase=True,
         max_df=0.95,
         min_df=2,
@@ -41,41 +44,33 @@ def create_simple_tokenizer_vectorizer():
 
 def get_vectorizer_info(vectorizer, X_train):
     """
-    Возвращает информацию о векторизаторе с простым токенизатором.
+    Returns information about the simple tokenizer vectorizer.
 
     Args:
-        vectorizer: Обученный векторизатор
-        X_train: Преобразованные тренировочные данные
+        vectorizer: Fitted vectorizer
+        X_train: Transformed training data
 
     Returns:
-        dict: Словарь с информацией о векторизаторе
+        dict: Dictionary containing vectorizer information
     """
-    vocabulary = vectorizer.vocabulary_
-
-    # Рассчитываем плотность матрицы
-    import numpy as np
-    if hasattr(X_train, 'toarray'):
-        density = (X_train != 0).sum() / np.prod(X_train.shape)
-    else:
-        density = np.count_nonzero(X_train) / X_train.size
-
-    return {
-        'name': 'CountVectorizer с простым токенизатором',
-        'vocabulary_size': len(vocabulary),
-        'density_percent': density * 100,
-        'shape': X_train.shape,
+    # Prepare specific info for this method
+    extra_info = {
+        'name': 'CountVectorizer with simple tokenizer',
         'tokenizer_type': 'simple_tokenizer (split)',
-        'example_features': list(vocabulary.keys())[:10],
         'note': (
-            'Внимание: простой split() не обрабатывает пунктуацию правильно'
-        )
+            'Note: simple split() does not handle punctuation correctly'
+        ),
+        # example_features is handled by the common function
     }
+
+    # Calculate common metrics using the shared function
+    return calculate_common_vectorizer_metrics(vectorizer, X_train, extra_info)
 
 
 if __name__ == "__main__":
-    # Пример использования
-    print("Модуль CountVectorizer с простым токенизатором")
+    # Example usage
+    print("CountVectorizer with Simple Tokenizer Module")
     sample_text = "I'm going to the park. It's beautiful!"
-    print(f"Пример токенизации: '{sample_text}'")
-    print(f"Результат: {simple_tokenizer(sample_text)}")
-    print("Примечание: 'I'm' не разделяется на 'I' и 'am'")
+    print(f"Example tokenization: '{sample_text}'")
+    print(f"Result: {simple_tokenizer(sample_text)}")
+    print("Note: 'I'm' is not separated into 'I' and 'am'")

@@ -1,15 +1,14 @@
 """
-Утилиты для работы с NLTK: загрузка ресурсов и вспомогательные функции.
+Utilities for working with NLTK: downloading resources and helper functions.
 """
-
 import nltk
 from nltk.corpus import wordnet
 
 
 def download_nltk_resources():
     """
-    Загружает необходимые ресурсы NLTK.
-    Вызывается один раз при инициализации проекта.
+    Downloads necessary NLTK resources.
+    Called once during project initialization.
     """
     resources = [
         'wordnet',
@@ -23,20 +22,21 @@ def download_nltk_resources():
     for resource in resources:
         try:
             nltk.download(resource, quiet=True)
-            print(f"Ресурс NLTK '{resource}' загружен")
+            print(f"NLTK resource '{resource}' downloaded")
         except Exception as e:
-            print(f"Ошибка загрузки ресурса '{resource}': {e}")
+            print(f"Error downloading resource '{resource}': {e}")
 
 
 def get_wordnet_pos(treebank_tag):
     """
-    Преобразует тег части речи из формата Penn Treebank в формат WordNet.
+    Converts a part-of-speech tag from the Penn Treebank format
+    to the WordNet format.
 
     Args:
-        treebank_tag (str): Тег части речи в формате Penn Treebank
+        treebank_tag (str): Part-of-speech tag in Penn Treebank format
 
     Returns:
-        str: Тег части речи в формате WordNet
+        str: Part-of-speech tag in WordNet format
     """
     if treebank_tag.startswith('J'):
         return wordnet.ADJ
@@ -47,12 +47,12 @@ def get_wordnet_pos(treebank_tag):
     elif treebank_tag.startswith('R'):
         return wordnet.ADV
     else:
-        # По умолчанию считаем существительным
+        # Default to noun
         return wordnet.NOUN
 
 
 if __name__ == "__main__":
-    # Тестирование утилит
+    # Testing utilities
     download_nltk_resources()
-    print("Тег 'NN' преобразуется в:", get_wordnet_pos('NN'))
-    print("Тег 'VBG' преобразуется в:", get_wordnet_pos('VBG'))
+    print("Tag 'NN' converts to:", get_wordnet_pos('NN'))
+    print("Tag 'VBG' converts to:", get_wordnet_pos('VBG'))

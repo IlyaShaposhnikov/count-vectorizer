@@ -1,38 +1,39 @@
 """
-CountVectorizer со стеммингом токенов.
-Стемминг обрезает окончания слов, оставляя основу (стем).
+CountVectorizer with token stemming.
+Stemming truncates word endings, leaving the root (stem).
 """
 
-from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer
+from sklearn.feature_extraction.text import CountVectorizer
+
+from utils.vectorizer_utils import calculate_common_vectorizer_metrics
 
 
 class StemTokenizer:
     """
-    Кастомный токенизатор для CountVectorizer со стеммингом.
-    Использует алгоритм Porter Stemmer для нахождения основы слова.
+    Custom tokenizer for CountVectorizer with stemming.
+    Uses the Porter Stemmer algorithm to find the word root.
     """
 
     def __init__(self):
-        """Инициализирует стеммер Porter."""
+        """Initializes the Porter stemmer."""
         self.porter = PorterStemmer()
 
     def __call__(self, doc):
         """
-        Токенизирует и стеммирует документ.
+        Tokenizes and stems a document.
 
         Args:
-            doc (str): Входной текст
+            doc (str): Input text
 
         Returns:
-            list: Список стеммированных токенов
+            list: List of stemmed tokens
         """
-        # Токенизируем документ
+        # Tokenize the document
         tokens = word_tokenize(doc)
 
-        # Применяем стемминг к каждому токену
+        # Apply stemming to each token
         stems = [self.porter.stem(t) for t in tokens]
 
         return stems
@@ -40,13 +41,14 @@ class StemTokenizer:
 
 def create_stemming_vectorizer():
     """
-    Создает CountVectorizer со стеммингом токенов.
+    Creates a CountVectorizer with token stemming.
 
     Returns:
-        CountVectorizer: Векторизатор со стеммингом
+        CountVectorizer: Vectorizer with stemming
     """
     vectorizer = CountVectorizer(
-        tokenizer=StemTokenizer(),  # Используем кастомный токенизатор
+        # Use custom tokenizer
+        tokenizer=StemTokenizer(),
         lowercase=True,
         max_df=0.95,
         min_df=2,
@@ -59,37 +61,28 @@ def create_stemming_vectorizer():
 
 def get_vectorizer_info(vectorizer, X_train):
     """
-    Возвращает информацию о векторизаторе со стеммингом.
+    Returns information about the stemming vectorizer.
 
     Args:
-        vectorizer: Обученный векторизатор
-        X_train: Преобразованные тренировочные данные
+        vectorizer: Fitted vectorizer
+        X_train: Transformed training data
 
     Returns:
-        dict: Словарь с информацией о векторизаторе
+        dict: Dictionary containing vectorizer information
     """
-    vocabulary = vectorizer.vocabulary_
-
-    # Рассчитываем плотность матрицы
-    if hasattr(X_train, 'toarray'):
-        density = (X_train != 0).sum() / np.prod(X_train.shape)
-    else:
-        density = np.count_nonzero(X_train) / X_train.size
-
-    return {
-        'name': 'CountVectorizer со стеммингом',
-        'vocabulary_size': len(vocabulary),
-        'density_percent': density * 100,
-        'shape': X_train.shape,
+    extra_info = {
+        'name': 'CountVectorizer with stemming',
         'tokenizer_type': 'StemTokenizer',
-        'example_features': list(vocabulary.keys())[:10]
     }
+
+    # Calculate common metrics using the shared function
+    return calculate_common_vectorizer_metrics(vectorizer, X_train, extra_info)
 
 
 if __name__ == "__main__":
-    # Пример использования
-    print("Модуль CountVectorizer со стеммингом")
+    # Example usage
+    print("CountVectorizer with Stemming Module")
     tokenizer = StemTokenizer()
     sample_text = "running runners ran"
-    print(f"Пример стемминга: '{sample_text}'")
-    print(f"Результат: {tokenizer(sample_text)}")
+    print(f"Example stemming: '{sample_text}'")
+    print(f"Result: {tokenizer(sample_text)}")

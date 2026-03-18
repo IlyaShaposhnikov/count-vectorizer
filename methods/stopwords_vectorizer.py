@@ -1,27 +1,31 @@
 """
-CountVectorizer с удалением стоп-слов (общеупотребительных слов).
-Удаление стоп-слов помогает уменьшить размерность и сфокусироваться
-на значимых словах.
+CountVectorizer with removal of stop words (common words).
+Removing stop words helps reduce dimensionality and focus
+on meaningful words.
 """
 
 from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
+
+from utils.vectorizer_utils import calculate_common_vectorizer_metrics
 
 
 def create_stopwords_vectorizer():
     """
-    Создает CountVectorizer с удалением английских стоп-слов.
+    Creates a CountVectorizer with removal of English stop words.
 
     Returns:
-        CountVectorizer: Векторизатор с удалением стоп-слов
+        CountVectorizer: Vectorizer with stop word removal
     """
-    # Используем встроенный список английских стоп-слов из sklearn
+    # Use built-in list of English stop words from sklearn
     vectorizer = CountVectorizer(
-        stop_words='english',  # Удаляем стандартные английские стоп-слов
+        # Remove standard English stop words
+        stop_words='english',
         lowercase=True,
         token_pattern=r'(?u)\b\w\w+\b',
-        max_df=0.95,  # Игнорируем слова, которые встречаются в >95% документов
-        min_df=2,     # Игнорируем слова, которые встречаются менее 2 раз
+        # Ignore words appearing in >95% of documents
+        max_df=0.95,
+        # Ignore words appearing in less than 2 documents
+        min_df=2,
         max_features=None
     )
 
@@ -30,35 +34,32 @@ def create_stopwords_vectorizer():
 
 def get_vectorizer_info(vectorizer, X_train):
     """
-    Возвращает информацию о векторизаторе с удалением стоп-слов.
+    Returns information about the stop word removal vectorizer.
 
     Args:
-        vectorizer: Обученный векторизатор
-        X_train: Преобразованные тренировочные данные
+        vectorizer: Fitted vectorizer
+        X_train: Transformed training data
 
     Returns:
-        dict: Словарь с информацией о векторизаторе
+        dict: Dictionary containing vectorizer information
     """
-    vocabulary = vectorizer.vocabulary_
-
-    # Рассчитываем плотность матрицы
-    if hasattr(X_train, 'toarray'):
-        density = (X_train != 0).sum() / np.prod(X_train.shape)
-    else:
-        density = np.count_nonzero(X_train) / X_train.size
-
-    # Получаем список удаленных стоп-слов
+    # Get the list of removed stop words
     stop_words = vectorizer.get_stop_words()
 
-    return {
-        'name': 'CountVectorizer с удалением стоп-слов',
-        'vocabulary_size': len(vocabulary),
-        'density_percent': density * 100,
-        'shape': X_train.shape,
+    # Prepare specific info for this method
+    extra_info = {
+        'name': 'CountVectorizer with stop word removal',
         'removed_stopwords_count': len(stop_words) if stop_words else 0,
-        'example_features': list(vocabulary.keys())[:10]
     }
+
+    # Calculate common metrics using the shared function
+    return calculate_common_vectorizer_metrics(vectorizer, X_train, extra_info)
 
 
 if __name__ == "__main__":
-    print("Модуль CountVectorizer с удалением стоп-слов")
+    print("CountVectorizer with Stop Word Removal Module")
+    vectorizer = create_stopwords_vectorizer()
+    sample_texts = ["This is a sample.", "Another example text."]
+    X = vectorizer.fit_transform(sample_texts)
+    info = get_vectorizer_info(vectorizer, X)
+    print(info)

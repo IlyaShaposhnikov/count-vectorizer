@@ -1,26 +1,31 @@
 """
-Базовый метод CountVectorizer без дополнительной обработки.
-Использует стандартные настройки sklearn CountVectorizer.
+Base CountVectorizer method without additional processing.
+Uses standard sklearn CountVectorizer settings.
 """
-
 from sklearn.feature_extraction.text import CountVectorizer
-import numpy as np
+
+from utils.vectorizer_utils import calculate_common_vectorizer_metrics
 
 
 def create_base_vectorizer():
     """
-    Создает и возвращает базовый CountVectorizer.
+    Creates and returns a basic CountVectorizer.
 
     Returns:
-        CountVectorizer: Базовый векторизатор с настройками по умолчанию
+        CountVectorizer: Basic vectorizer with default settings
     """
-    # Используем стандартные параметры CountVectorizer
+    # Use standard CountVectorizer parameters
     vectorizer = CountVectorizer(
-        lowercase=True,      # Приводим текст к нижнему регистру
-        token_pattern=r'(?u)\b\w\w+\b',  # Стандартный паттерн для токенов
-        max_df=1.0,          # Максимальная частота слова в документах
-        min_df=1,           # Минимальная частота слова в документах
-        max_features=None   # Без ограничения количества фич
+        # Convert text to lowercase
+        lowercase=True,
+        # Standard token pattern
+        token_pattern=r'(?u)\b\w\w+\b',
+        # Maximum word frequency across documents
+        max_df=1.0,
+        # Minimum word frequency across documents
+        min_df=1,
+        # No limit on number of features
+        max_features=None
     )
 
     return vectorizer
@@ -28,37 +33,24 @@ def create_base_vectorizer():
 
 def get_vectorizer_info(vectorizer, X_train):
     """
-    Возвращает информацию о векторизаторе и преобразованных данных.
+    Returns information about the vectorizer and transformed data.
 
     Args:
-        vectorizer: Обученный векторизатор
-        X_train: Преобразованные тренировочные данные
+        vectorizer: Fitted vectorizer
+        X_train: Transformed training data
 
     Returns:
-        dict: Словарь с информацией о векторизаторе
+        dict: Dictionary containing vectorizer information
     """
-    # Получаем словарь (слово -> индекс)
-    vocabulary = vectorizer.vocabulary_
-
-    # Рассчитываем плотность матрицы (процент ненулевых элементов)
-    if hasattr(X_train, 'toarray'):
-        # Если это разреженная матрица
-        density = (X_train != 0).sum() / np.prod(X_train.shape)
-    else:
-        # Если это плотная матрица
-        density = np.count_nonzero(X_train) / X_train.size
-
-    return {
-        'name': 'Базовый CountVectorizer',
-        'vocabulary_size': len(vocabulary),
-        'density_percent': density * 100,
-        'shape': X_train.shape,
-        # Пример первых 10 фич
-        'example_features': list(vocabulary.keys())[:10]
+    # Prepare specific info for this method
+    extra_info = {
+        'name': 'Basic CountVectorizer',
     }
+    # Calculate common metrics using the shared function
+    return calculate_common_vectorizer_metrics(vectorizer, X_train, extra_info)
 
 
 if __name__ == "__main__":
-    # Пример использования
-    print("Базовый модуль CountVectorizer")
-    print("Использование: импортируйте create_base_vectorizer() в main.py")
+    # Example usage
+    print("Basic CountVectorizer module")
+    print("Usage: import create_base_vectorizer() in main.py")
